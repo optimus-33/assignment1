@@ -1,9 +1,32 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Accounts
-from .serializers import AccountSerializer
-from .utils import getAccList
+from .utils import getAccList, getBalance, getSingle
 # Create your views here.
+
+@api_view(['GET'])
+def getRoutes(request):
+
+    routes = [
+        {
+            'Endpoint': '/api/data/',
+            'method': 'GET',
+            'body': None,
+            'description': 'Returns an array of Account'
+        },
+        {
+            'Endpoint': '/api/data/id',
+            'method': 'GET',
+            'body': None,
+            'description': 'Returns a single account info'
+        },
+        {
+            'Endpoint': '/api/data/',
+            'method': 'POST',
+            'body': {'acc_balance': "<Amount>"},
+            'description': 'Fetches account balance greater than the mentioned details'
+        },
+    ]
+    return Response(routes)
 
 @api_view(['GET','POST'])
 def getData(request):
@@ -11,7 +34,9 @@ def getData(request):
         return getAccList(request)
     
     if request.method == 'POST':
-        data = request.data
-        par = Accounts.objects.filter(acc_balance__gt=data['acc_balance'])
-        serializer = AccountSerializer(par, many=True)
-        return Response(serializer.data)
+        return getBalance(request)
+    
+@api_view(['GET'])
+def getAccount(request,pk):
+    if request.method == 'GET':
+        return getSingle(request,pk)
