@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .utils import getAccList, getBalance, getSingle
+from .models import APIKey
 # Create your views here.
 
 @api_view(['GET'])
@@ -34,7 +35,13 @@ def getData(request):
         return getAccList(request)
     
     if request.method == 'POST':
-        return getBalance(request)
+        header_key = request.META.get('HTTP_SIYA')
+        key_access = APIKey.objects.get(id=1).key
+        jas = header_key == key_access
+        if jas:
+            return getBalance(request)
+        else:
+            return Response('Sorry, Bro..!')
     
 @api_view(['GET'])
 def getAccount(request,pk):
